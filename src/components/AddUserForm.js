@@ -1,14 +1,37 @@
-import React from "react";
+import React, { useState } from "react";
 
 function AddUserForm({ newUser, setNewUser, onAddUser }) {
+  const [errors, setErrors] = useState({});
+
+  const validateForm = () => {
+    const errors = {};
+    if (!newUser.name.trim()) {
+      errors.name = "Name is required";
+    }
+    if (!newUser.username.trim()) {
+      errors.username = "Username is required";
+    }
+    if (!newUser.email.trim()) {
+      errors.email = "Email is required";
+    } else if (!/\S+@\S+\.\S+/.test(newUser.email)) {
+      errors.email = "Email address is invalid";
+    }
+    return errors;
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const formErrors = validateForm();
+    if (Object.keys(formErrors).length === 0) {
+      onAddUser();
+      setErrors({});
+    } else {
+      setErrors(formErrors);
+    }
+  };
+
   return (
-    <form
-      className="form-inline mb-4"
-      onSubmit={(e) => {
-        e.preventDefault();
-        onAddUser();
-      }}
-    >
+    <form className="form-inline mb-4" onSubmit={handleSubmit}>
       <div className="form-group mr-2">
         <input
           type="text"
@@ -17,6 +40,7 @@ function AddUserForm({ newUser, setNewUser, onAddUser }) {
           value={newUser.name}
           onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
         />
+        {errors.name && <div className="text-danger">{errors.name}</div>}
       </div>
       <div className="form-group mr-2">
         <input
@@ -24,10 +48,11 @@ function AddUserForm({ newUser, setNewUser, onAddUser }) {
           className="form-control"
           placeholder="Username"
           value={newUser.username}
-          onChange={(e) =>
-            setNewUser({ ...newUser, username: e.target.value })
-          }
+          onChange={(e) => setNewUser({ ...newUser, username: e.target.value })}
         />
+        {errors.username && (
+          <div className="text-danger">{errors.username}</div>
+        )}
       </div>
       <div className="form-group mr-2">
         <input
@@ -36,6 +61,16 @@ function AddUserForm({ newUser, setNewUser, onAddUser }) {
           placeholder="Email"
           value={newUser.email}
           onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+        />
+        {errors.email && <div className="text-danger">{errors.email}</div>}
+      </div>
+      <div className="form-group mr-2">
+        <input
+          type="text"
+          className="form-control"
+          placeholder="Address"
+          value={newUser.address}
+          onChange={(e) => setNewUser({ ...newUser, address: e.target.value })}
         />
       </div>
       <div className="form-group mr-2">
